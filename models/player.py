@@ -18,3 +18,12 @@ class Player:
         self.eligible_positions = eligible_positions
         self.selected_position = selected_position
 
+
+    def to_dict(self):
+        return {
+            "player_id": self.player_id,
+            "name": self.name,
+            "status": self.status,
+            "eligible_positions": [pos for pos in self.eligible_positions],
+            "selected_position": self.selected_position
+        }

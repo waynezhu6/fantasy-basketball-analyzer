@@ -1,10 +1,13 @@
+from dataclasses import dataclass
 from enum import Enum
+
 
 # League Constants
 OAUTH2_JSON_FILENAME = "oauth2.json"
 LEAGUE_NAME = "nba"
 CURRENT_YEAR = 2024
 LEAGUE_INDEX = 0
+
 
 # Yahoo Player Position Enum
 class PlayerPosition(Enum):
@@ -13,6 +16,7 @@ class PlayerPosition(Enum):
     SF = "SF"
     PF = "PF"
     C = "C"
+
 
 # Yahoo API Stat IDs
 STAT_FG_RATIO_ID = '9004003'
@@ -26,3 +30,19 @@ STAT_AST_ID = '16'
 STAT_STL_ID = '17'
 STAT_BLK_ID = '18'
 STAT_TOV_ID = '19'
+
+
+# Player Stats
+@dataclass
+class PlayerStats:
+    FGA: int
+    FGM: int
+    FTA: int
+    FTM: int
+    PTS: int
+    REB: int
+    AST: int
+    STL: int
+    BLK: int
+    TOV: int
+    GP: int

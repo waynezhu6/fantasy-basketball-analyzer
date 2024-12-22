@@ -1,8 +1,6 @@
 from typing import List
-from typing import List
-from yahoo_oauth import OAuth2
 import yahoo_fantasy_api as yfa
-from config.constants import CURRENT_YEAR, LEAGUE_NAME, OAUTH2_JSON_FILENAME
+from models.matchup import Matchup
 from models.team import Team
 from models.player import Player
 
@@ -18,9 +16,18 @@ class League:
         self.matchups = self.generate_matchups()
 
 
+    def refresh(self):
+        self.matchups = self.generate_matchups()
+
+
     def generate_matchups(self):
         raw_matchups = self.league.matchups()['fantasy_content']['league'][1]['scoreboard']['0']['matchups']
+        matchups = []
+
         for matchup_key in raw_matchups:
+            if matchup_key == 'count':
+                continue
+
             # will print list of stat_id -> value pairs
             raw_matchup = raw_matchups[matchup_key]['matchup']['0']['teams']
             # team_info = raw_matchups[matchup_key]['matchup']['0']['teams']['0']['team'][0]
@@ -29,8 +36,15 @@ class League:
             team1_key = raw_matchup['0']['team'][0][0]['team_key']
             team1_stats = raw_matchup['0']['team'][1]
 
-            print(team1_stats)
-            return
+            team2_key = raw_matchup['1']['team'][0][0]['team_key']
+            team2_stats = raw_matchup['1']['team'][1]
+            
+            matchups.append(Matchup(
+                self.get_team_by_team_id(team1_key),
+                self.get_team_by_team_id(team2_key)
+            ))
+
+        return matchups
 
 
     def generate_teams(self) -> List[Team]:
@@ -70,3 +84,10 @@ class League:
             if team.team_key == team_id:
                 return team
         return None
+    
+
+    def to_dict(self):
+        return {
+            # "teams": [team.to_dict() for team in self.teams],
+            "matchups": [matchup.to_dict() for matchup in self.matchups]
+        }
