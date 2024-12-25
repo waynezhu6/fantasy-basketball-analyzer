@@ -1,12 +1,13 @@
 from datetime import date
-from typing import Dict, List
+from typing import Dict
 import yahoo_fantasy_api as yfa
-from data.schedule import get_games_played_by_team, get_games_remaining_by_team
-from data.player_stats import get_player_team, to_matchup_stats_args
+from data.schedule import get_games_scheduled_by_team, get_games_remaining_by_team
+from data.player_stats import get_player_team
 from models.matchup import Matchup
-from models.matchup_stats import MatchupStats
+from models.stats import Stats
 from models.team import Team
 from models.player import Player
+from utils.utils import to_matchup_stats_args
 
 
 class League:
@@ -36,7 +37,7 @@ class League:
             raw_matchup = raw_matchups[matchup_key]['matchup']['0']['teams']
 
             team1_key = raw_matchup['0']['team'][0][0]['team_key']
-            team1_current_matchup_stats = MatchupStats(*to_matchup_stats_args(raw_matchup['0']['team'][1]))
+            team1_current_matchup_stats = Stats(*to_matchup_stats_args(raw_matchup['0']['team'][1]))
             team1 = self._generate_team(
                 team1_key, 
                 yfa_league_teams[team1_key], 
@@ -45,7 +46,7 @@ class League:
             teams.append(team1)
 
             team2_key = raw_matchup['1']['team'][0][0]['team_key']
-            team2_current_matchup_stats = MatchupStats(*to_matchup_stats_args(raw_matchup['1']['team'][1]))
+            team2_current_matchup_stats = Stats(*to_matchup_stats_args(raw_matchup['1']['team'][1]))
             team2 = self._generate_team(
                 team2_key, 
                 yfa_league_teams[team2_key],
@@ -62,7 +63,7 @@ class League:
         self, 
         team_key: str, 
         yfa_team_obj: Dict, 
-        current_matchup_stats: MatchupStats
+        current_matchup_stats: Stats
     ) -> Team:
         
         yfa_team = self._yfa_league.to_team(team_key)
@@ -88,7 +89,7 @@ class League:
                 player['status'],
                 player['eligible_positions'],
                 player['selected_position'],
-                get_games_played_by_team(player_team, self.current_day),
+                get_games_scheduled_by_team(player_team),
                 get_games_remaining_by_team(player_team, self.current_day)
             ))
         return roster

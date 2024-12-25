@@ -14,7 +14,7 @@ class Player:
         status: str, 
         eligible_positions: List[PlayerPosition], 
         selected_position: PlayerPosition,
-        games_played: int,
+        games_scheduled: int,
         games_remaining: int
     ):
         self.player_id = player_id
@@ -24,8 +24,8 @@ class Player:
         self.eligible_positions = eligible_positions
         self.selected_position = selected_position
         self.stats = get_player_stats(player_name)
-        self.games_played = games_played
-        self.games_remaining = games_remaining
+        self.games_scheduled = games_scheduled
+        self.games_remaining = games_remaining if status != "INJ" else 0
         
 
     def to_dict(self):
@@ -35,7 +35,7 @@ class Player:
             "team": self.team,
             "status": self.status,
             "stats": self.stats.to_dict(),
-            "games_played": self.games_played,
+            "games_scheduled": self.games_scheduled,
             "games_remaining": self.games_remaining,
             "eligible_positions": [pos for pos in self.eligible_positions],
             "selected_position": self.selected_position

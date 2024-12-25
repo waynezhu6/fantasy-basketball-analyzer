@@ -1,32 +1,14 @@
 import re
 from typing import Dict, List, Optional, Tuple
-import unicodedata
 
 import requests
 
-from config.constants import PLAYER_STATS_FILENAME, PlayerStats, get_adapted_team_abbreviation
+from config.constants import PLAYER_STATS_FILENAME
+from models.stats import Stats
+from utils.utils import clean_text, get_adapted_team_abbreviation, get_cleaned_player_name
 
 
-def clean_text(input_str: str) -> str:
-    # Remove accents
-    normalized = unicodedata.normalize('NFD', input_str)
-    no_accents = ''.join(char for char in normalized if unicodedata.category(char) != 'Mn')
-    # Remove non-alphanumeric characters except apostrophes and dashes
-    cleaned = ''.join(char for char in no_accents if char.isalnum() or char.isspace() or char in ("'", "-"))
-    return cleaned
-
-
-def get_cleaned_player_name(player_name: str) -> str:
-    name = clean_text(player_name)
-    interesting_names = {
-        'PJ Washington Jr': 'PJ Washington',
-        'Nic Claxton': 'Nicolas Claxton',
-        'Alex Sarr': 'Alexandre Sarr'
-    }
-    return interesting_names.get(name, name)
-
-
-def generate_stats() -> Tuple[Dict[str, PlayerStats], Dict[str, str]]:
+def generate_stats() -> Tuple[Dict[str, Stats], Dict[str, str]]:
     player_stats = {}
     player_teams = {}
     with open(PLAYER_STATS_FILENAME, mode="r") as file:
@@ -69,7 +51,7 @@ def generate_stats() -> Tuple[Dict[str, PlayerStats], Dict[str, str]]:
                     elif i < 8:
                         stats.append(float(line))
 
-                player_stats[name] = PlayerStats(*stats)
+                player_stats[name] = Stats(*stats)
                 player_teams[name] = team
 
     return player_stats, player_teams
@@ -84,46 +66,9 @@ def get_player_team(player_name: str) -> Optional[str]:
     return player_teams.get(player_name, None)
 
 
-def get_player_stats(player_name: str) -> Optional[PlayerStats]:
+def get_player_stats(player_name: str) -> Optional[Stats]:
     player_name = get_cleaned_player_name(player_name)
     return player_stats.get(player_name)
-
-
-def to_matchup_stats_args(raw: str) -> List[int]:
-    stats = raw['team_stats']['stats']
-    for raw_stat in stats:
-        stat = raw_stat['stat']
-        if stat['stat_id'] == '9004003':
-            fgm, fga = stat['value'].split('/')
-        elif stat['stat_id'] == '9007006':
-            ftm, fta = stat['value'].split('/')
-        elif stat['stat_id'] == '10':
-            _3ptm = int(stat['value'])
-        elif stat['stat_id'] == '12':
-            pts = int(stat['value'])
-        elif stat['stat_id'] == '15':
-            reb = int(stat['value'])
-        elif stat['stat_id'] == '16':
-            ast = int(stat['value'])
-        elif stat['stat_id'] == '17':
-            stl = int(stat['value'])
-        elif stat['stat_id'] == '18':
-            blk = int(stat['value'])
-        elif stat['stat_id'] == '19':
-            tov = int(stat['value'])
-
-    team_points = raw['team_points']['total']
-    games_remaining = raw['team_remaining_games']['total']['remaining_games']
-    games_in_progress = raw['team_remaining_games']['total']['live_games']
-    games_completed = raw['team_remaining_games']['total']['completed_games']
-
-    return [
-        int(fgm), int(fga), int(ftm), int(fta), _3ptm, pts, reb, ast, stl, blk, tov,
-        team_points, games_remaining, games_in_progress, games_completed
-    ]
-
-
-# def get_projected_matchup_stats(player_stats: List[PlayerStats], )
 
 
 def refresh_stats():

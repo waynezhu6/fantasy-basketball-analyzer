@@ -1,5 +1,5 @@
 from typing import List
-from models.matchup_stats import MatchupStats
+from models.stats import Stats
 from models.player import Player
 
 
@@ -12,7 +12,7 @@ class Team:
         roster: List[Player],
         waiver_priority: int,
         roster_adds: int, 
-        current_matchup_stats: MatchupStats
+        current_matchup_stats: Stats
     ):
         self.team_key = team_key
         self.team_name = team_name
@@ -24,10 +24,12 @@ class Team:
             self._generate_matchup_stats(current_matchup_stats)
         
     
-    def _generate_matchup_stats(self, current_matchup_stats: MatchupStats):
-        future_matchup_stats = current_matchup_stats
-        projected_matchup_stats = current_matchup_stats
-        return future_matchup_stats, projected_matchup_stats
+    def _generate_matchup_stats(self, current_matchup_stats: Stats):
+        future_stats = Stats()
+        for player in self.roster:
+            future_stats = future_stats + (player.stats * player.games_remaining)
+        projected_stats = current_matchup_stats + future_stats
+        return future_stats, projected_stats
 
 
     def to_dict(self):
@@ -38,4 +40,6 @@ class Team:
             "waiver_priority": self.waiver_priority,
             "roster_adds": self.roster_adds,
             "current_matchup_stats": self.current_matchup_stats.to_dict(),
+            "future_matchup_stats": self.future_matchup_stats.to_dict(),
+            "projected_matchup_stats": self.projected_matchup_stats.to_dict()
         }

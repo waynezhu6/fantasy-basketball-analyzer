@@ -2,7 +2,7 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 
-from config.constants import get_nba_team_abbreviation
+from utils.utils import get_nba_team_abbreviation
 
 
 def generate_schedule():
@@ -43,8 +43,8 @@ def get_team_schedule(team_name: str) -> List[int]:
     return schedule.get(team_name)
 
 
-def get_games_played_by_team(team_name: str, current_day: int) -> int:
-    return sum(get_team_schedule(team_name)[:current_day])
+def get_games_scheduled_by_team(team_name: str) -> int:
+    return sum(get_team_schedule(team_name))
 
 
 def get_games_remaining_by_team(team_name: str, current_day: int) -> int:
