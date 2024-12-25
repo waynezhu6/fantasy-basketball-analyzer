@@ -12,7 +12,10 @@ class Team:
         roster: List[Player],
         waiver_priority: int,
         roster_adds: int, 
-        current_matchup_stats: Stats
+        current_matchup_stats: Stats,
+        team_points: int,
+        games_played: int,
+        games_remaining: int
     ):
         self.team_key = team_key
         self.team_name = team_name
@@ -22,6 +25,9 @@ class Team:
         self.current_matchup_stats = current_matchup_stats
         self.future_matchup_stats, self.projected_matchup_stats = \
             self._generate_matchup_stats(current_matchup_stats)
+        self.team_points = team_points
+        self.games_played = games_played
+        self.games_remaining = games_remaining
         
     
     def _generate_matchup_stats(self, current_matchup_stats: Stats):
@@ -41,5 +47,8 @@ class Team:
             "roster_adds": self.roster_adds,
             "current_matchup_stats": self.current_matchup_stats.to_dict(),
             "future_matchup_stats": self.future_matchup_stats.to_dict(),
-            "projected_matchup_stats": self.projected_matchup_stats.to_dict()
+            "projected_matchup_stats": self.projected_matchup_stats.to_dict(),
+            "team_points": self.team_points,
+            "games_played": self.games_played,
+            "games_remaining": self.games_remaining
         }

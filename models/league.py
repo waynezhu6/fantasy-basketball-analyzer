@@ -7,7 +7,7 @@ from models.matchup import Matchup
 from models.stats import Stats
 from models.team import Team
 from models.player import Player
-from utils.utils import to_matchup_stats_args
+from utils.utils import get_n_games_args, to_matchup_stats_args
 
 
 class League:
@@ -41,7 +41,8 @@ class League:
             team1 = self._generate_team(
                 team1_key, 
                 yfa_league_teams[team1_key], 
-                team1_current_matchup_stats
+                team1_current_matchup_stats,
+                *get_n_games_args(raw_matchup['0']['team'][1])
             )
             teams.append(team1)
 
@@ -50,7 +51,8 @@ class League:
             team2 = self._generate_team(
                 team2_key, 
                 yfa_league_teams[team2_key],
-                team2_current_matchup_stats
+                team2_current_matchup_stats,
+                *get_n_games_args(raw_matchup['1']['team'][1])
             )
             teams.append(team2)
 
@@ -63,7 +65,10 @@ class League:
         self, 
         team_key: str, 
         yfa_team_obj: Dict, 
-        current_matchup_stats: Stats
+        current_matchup_stats: Stats,
+        team_points: int,
+        games_played: int,
+        games_remaining: int,
     ) -> Team:
         
         yfa_team = self._yfa_league.to_team(team_key)
@@ -74,7 +79,10 @@ class League:
             self._generate_roster(yfa_team.roster()),
             int(yfa_team_obj['waiver_priority']),
             int(yfa_team_obj['roster_adds']['value']),
-            current_matchup_stats
+            current_matchup_stats,
+            team_points,
+            games_played,
+            games_remaining
         )
 
 

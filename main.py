@@ -23,10 +23,9 @@ CORS(app)
 oauth = OAuth2(None, None, from_file=OAUTH2_JSON_FILENAME)
 game = yfa.Game(oauth, LEAGUE_NAME)
 leagues = []
-# for league_id in game.league_ids(year=CURRENT_YEAR):
-#     league = game.to_league(league_id)
-#     leagues.append(League(league))
-leagues.append(League(game.to_league(game.league_ids(year=CURRENT_YEAR)[0])))
+for league_id in game.league_ids(year=CURRENT_YEAR):
+    league = game.to_league(league_id)
+    leagues.append(League(league))
 
 
 # Serve the main React app (index.html)
@@ -41,19 +40,25 @@ def serve_static(path):
 
 
 # General endpoint for all data
-@app.route("/api")
-def get_all():
-    return json.dumps([league.to_dict() for league in leagues])
+@app.route("/api/<league_index>")
+def get_all(league_index):
+    try:
+        return json.dumps(leagues[int(league_index)].to_dict())
+    except IndexError:
+        return json.dumps({})
 
 
 # Get team by team name
-@app.route("/api/team/<team_name>")
-def get_team(team_name):
-    for league in leagues:
+@app.route("/api/<league_index>/team/<team_name>")
+def get_team(league_index, team_name):
+    try:
+        league = leagues[int(league_index)]
         for team in league.teams:
             if team.team_name == team_name:
                 return json.dumps(team.to_dict())
-    return json.dumps({})
+        return json.dumps({})
+    except IndexError:
+        return json.dumps({})
 
 
 # Catch-all route for React (handles React Router paths)

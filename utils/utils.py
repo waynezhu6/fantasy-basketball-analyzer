@@ -26,15 +26,18 @@ def to_matchup_stats_args(raw: str) -> List[int]:
         elif stat['stat_id'] == '19':
             tov = int(stat['value'])
 
-    # team_points = raw['team_points']['total']
-    # games_remaining = raw['team_remaining_games']['total']['remaining_games']
-    # games_in_progress = raw['team_remaining_games']['total']['live_games']
-    # games_completed = raw['team_remaining_games']['total']['completed_games']
-
     return [
         int(fgm), int(fga), int(ftm), int(fta), _3ptm, pts, reb, ast, stl, blk, tov,
-        # team_points, games_remaining, games_in_progress, games_completed
     ]
+
+
+def get_n_games_args(raw: str) -> List[int]:
+    team_points = int(raw['team_points']['total'])
+    games_remaining = int(raw['team_remaining_games']['total']['remaining_games'])
+    games_in_progress = int(raw['team_remaining_games']['total']['live_games'])
+    games_completed = int(raw['team_remaining_games']['total']['completed_games'])
+
+    return [team_points, games_completed, games_remaining + games_in_progress]
 
 
 def get_nba_team_abbreviation(team_name: str) -> str:
