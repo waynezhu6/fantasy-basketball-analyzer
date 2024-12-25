@@ -1,10 +1,10 @@
 import re
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 import unicodedata
 
 import requests
 
-from config.constants import PLAYER_STATS_FILENAME, PlayerStats
+from config.constants import PLAYER_STATS_FILENAME, PlayerStats, get_adapted_team_abbreviation
 
 
 def clean_text(input_str: str) -> str:
@@ -47,7 +47,7 @@ def generate_stats() -> Tuple[Dict[str, PlayerStats], Dict[str, str]]:
                 adp = headers[1]
                 name = clean_text(headers[2])
                 pos = headers[3]
-                team = headers[4]
+                team = get_adapted_team_abbreviation(headers[4])
                 gp_proj = int(headers[5])
                 mpg = float(headers[6])
                 
@@ -81,19 +81,15 @@ player_stats, player_teams = generate_stats()
 
 def get_player_team(player_name: str) -> Optional[str]:
     player_name = get_cleaned_player_name(player_name)
-    if player_name in player_teams:
-        return player_teams[player_name]
-    return None
+    return player_teams.get(player_name, None)
 
 
 def get_player_stats(player_name: str) -> Optional[PlayerStats]:
     player_name = get_cleaned_player_name(player_name)
-    if player_name in player_stats:
-        return player_stats[player_name]
-    return None
+    return player_stats.get(player_name)
 
 
-def to_matchup_stats_args(raw: str):
+def to_matchup_stats_args(raw: str) -> List[int]:
     stats = raw['team_stats']['stats']
     for raw_stat in stats:
         stat = raw_stat['stat']
@@ -125,6 +121,9 @@ def to_matchup_stats_args(raw: str):
         int(fgm), int(fga), int(ftm), int(fta), _3ptm, pts, reb, ast, stl, blk, tov,
         team_points, games_remaining, games_in_progress, games_completed
     ]
+
+
+# def get_projected_matchup_stats(player_stats: List[PlayerStats], )
 
 
 def refresh_stats():

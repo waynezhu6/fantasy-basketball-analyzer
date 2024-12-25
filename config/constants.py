@@ -103,3 +103,14 @@ def get_nba_team_abbreviation(team_name: str) -> str:
     }
 
     return nba_teams.get(team_name)
+
+
+def get_adapted_team_abbreviation(team_name: str) -> str:
+    filter = {
+        "GS": "GSW",
+        "SA": "SAS",
+        "NY": "NYK",
+        "NO": "NOP",
+        "PHO": "PHX",
+    }
+    return filter.get(team_name, team_name)

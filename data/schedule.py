@@ -42,3 +42,11 @@ def refresh_schedule():
 def get_team_schedule(team_name: str) -> List[int]:
     return schedule.get(team_name)
 
+
+def get_games_played_by_team(team_name: str, current_day: int) -> int:
+    return sum(get_team_schedule(team_name)[:current_day])
+
+
+def get_games_remaining_by_team(team_name: str, current_day: int) -> int:
+    return sum(get_team_schedule(team_name)[current_day:])
+

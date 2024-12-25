@@ -3,7 +3,7 @@ import json
 import time
 import pytz
 from data.schedule import refresh_schedule
-from data.stats import refresh_stats
+from data.player_stats import refresh_stats
 import schedule
 from yahoo_oauth import OAuth2
 import yahoo_fantasy_api as yfa
