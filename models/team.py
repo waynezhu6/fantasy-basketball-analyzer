@@ -17,6 +17,11 @@ class Team:
         self.roster = roster
         self.waiver_priority = waiver_priority
         self.roster_adds = roster_adds
+        self.matchup_stats = None
+    
+
+    def set_matchup_stats(self, matchup_stats):
+        self.matchup_stats = matchup_stats
 
 
     def to_dict(self):
@@ -25,5 +30,6 @@ class Team:
             "team_name": self.team_name,
             "roster": [player.to_dict() for player in self.roster],
             "waiver_priority": self.waiver_priority,
-            "roster_adds": self.roster_adds
+            "roster_adds": self.roster_adds,
+            "matchup_stats": self.matchup_stats.to_dict()
         }
